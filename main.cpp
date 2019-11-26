@@ -58,20 +58,30 @@ T distance(const Segment<T>& s1, const Segment<T>& s2)
 	else
 	{
 		/* Ищем ближайшие точки на концах отрезков */
+		bool perpendicular = false;
+
 		/* Если точка первого отрезка вышла за границы, подводим её к ближайшему краю */
 		if (sc < 0)
 		{
 			sc = 0.0;
 
 			/* Пересчитываем вторую точку, если она попадает в диапазон */
-			tc = (uw > 0 && uw < uv) ? uw / uv : tc;
+			if (uw > 0 && uw < uv)
+			{
+				tc = uw / uv;
+				perpendicular = true;
+			}
 		}
 		else if (sc > 1)
 		{
 			sc = 1.0;
 
 			/* Пересчитываем вторую точку, если она попадает в диапазон */
-			tc = (uu > -uw) && (uu + uw < uv) ? (uu + uw) / uv : tc;
+			if ((uu > -uw) && (uu + uw < uv))
+			{
+				tc = (uu + uw) / uv;
+				perpendicular = true;
+			}
 		}
 
 		/* Если точка второго отрезка вышла за границы, подводим её к ближайшему краю */
@@ -80,33 +90,53 @@ T distance(const Segment<T>& s1, const Segment<T>& s2)
 			tc = 0;
 
 			/* Пересчитываем первую точку, если она попадает в диапазон */
-			sc =  (-uw > 0) &&(-uw < uu) ? -uw / uu : sc;
+			if ((-uw > 0) && (-uw < uu))
+			{
+				sc = -uw / uu;
+				perpendicular = true;
+			}
 		}
 		else if (tc > 1)
 		{
 			tc = 1;
 
 			/* Пересчитываем первую точку, если она попадает в диапазон */
-			sc = (vv > vw) && (vv - vw < uv) ? (vv - vw) / uv : sc;
+			if ((vv > vw) && (vv - vw < uv));
+			{
+				sc = (vv - vw) / uv;
+				perpendicular = true;
+			}
 		}
 
-		/* Искомое расстояние */
-		return norm(s1.point(sc) - s2.point(tc));
+		/* Если ни из одной из крайних точек невозможно построить перпендикуляр */
+		if (!perpendicular)
+		{
+			/* Искомое расстояние: минимальное расстояние между концами отрезков */
+			return std::min<T>(	{	
+									norm(s1.point(0.0) - s2.point(0.0)), norm(s1.point(0.0) - s2.point(1.0)),
+									norm(s1.point(1.0) - s2.point(0.0)), norm(s1.point(1.0) - s2.point(1.0)) 
+								});
+		}
+		else
+		{
+			/* Искомое расстояние */
+			return norm(s1.point(sc) - s2.point(tc));
+		}
 	}
 }
 
 /* Кейзы */
-#define CASE_OVERLAPPED
+//#define CASE_OVERLAPPED
 #ifndef CASE_OVERLAPPED
 #define CASE_NOT_OVERLAPPED
 #endif
 
-#define CASE_INTERSECTED
+//#define CASE_INTERSECTED
 //#define CASE_PARALLEL
 //#define CASE_COMPLANAR
 //#define CASE_SKEW
 //#define CASE_COLLINEAR
-//#define CASE_PERPENDICULAR
+#define CASE_PERPENDICULAR
 
 #if defined(CASE_INTERSECTED)
 	/* Точки первого отрезка */
@@ -135,7 +165,7 @@ T distance(const Segment<T>& s1, const Segment<T>& s2)
 	auto Q0 = Point{ 5.0, 5.0, 0.0 };
 	auto Q1 = Point{ 9.0, 5.0, 0.0 };
 
-#elif defined(CASE_COMPLANAR) && defined(CASE_OVERLAPPED) // X
+#elif defined(CASE_COMPLANAR) && defined(CASE_OVERLAPPED)
 	/* Точки первого отрезка */
 	auto P0 = Point{ 0.0, 0.0, 0.0 };
 	auto P1 = Point{ 5.0, 0.0, 0.0 };
