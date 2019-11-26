@@ -10,13 +10,6 @@ using namespace Geom3D;
 template <typename T>
 T distance(const Segment<T>& s1, const Segment<T>& s2)
 {
-	/* Отладочная печать */
-	print("[Segment 1]", "P0:", s1.begPoint().x, s1.begPoint().y, s1.begPoint().z);
-	print("[Segment 1]", "P1:", s1.endPoint().x, s1.endPoint().y, s1.endPoint().z);
-
-	print("[Segment 2]", "Q0:", s2.begPoint().x, s2.begPoint().y, s2.begPoint().z);
-	print("[Segment 2]", "Q1:", s2.endPoint().x, s2.endPoint().y, s2.endPoint().z);
-
 	/* Кэширование данных */
 	auto uu = dot(s1.vector(), s1.vector());
 	auto uv = dot(s1.vector(), s2.vector());
